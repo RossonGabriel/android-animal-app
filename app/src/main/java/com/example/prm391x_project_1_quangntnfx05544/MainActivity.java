@@ -1,6 +1,5 @@
 package com.example.prm391x_project_1_quangntnfx05544;
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
 import static com.example.prm391x_project_1_quangntnfx05544.Constant.KEY_BACKGROUND_IMAGE;
 import static com.example.prm391x_project_1_quangntnfx05544.Constant.KEY_DESCRIPTION;
 import static com.example.prm391x_project_1_quangntnfx05544.Constant.KEY_FAVORITE;
@@ -12,7 +11,6 @@ import static com.example.prm391x_project_1_quangntnfx05544.Constant.REQUEST_COD
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -47,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
                 intent.putExtras(bundle);
                 startActivityForResult(intent, REQUEST_CODE_MAIN);
+                overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
             });
             if (animal.isFavorite()) {
                 favorite.setVisibility(View.VISIBLE);
@@ -92,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
+        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right);
 
         if (requestCode == REQUEST_CODE_MAIN && resultCode == Activity.RESULT_OK) {
             Bundle bundle = intent.getExtras();
