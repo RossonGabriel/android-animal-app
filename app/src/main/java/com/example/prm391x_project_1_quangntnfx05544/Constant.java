@@ -4,6 +4,7 @@ public class Constant {
     public static final String DATABASE_NAME = "AnimalManager.db";
     public static final int DATABASE_VERSION = 1;
     public static final String TABLE_NAME = "animals";
+    public static final int REQUEST_CODE_MAIN = 101;
 
     public static final String KEY_ID = "id";
     public static final String KEY_NAME = "name";

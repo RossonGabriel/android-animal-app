@@ -1,19 +1,23 @@
 package com.example.prm391x_project_1_quangntnfx05544;
 
+import static androidx.constraintlayout.widget.Constraints.TAG;
 import static com.example.prm391x_project_1_quangntnfx05544.Constant.KEY_BACKGROUND_IMAGE;
 import static com.example.prm391x_project_1_quangntnfx05544.Constant.KEY_DESCRIPTION;
 import static com.example.prm391x_project_1_quangntnfx05544.Constant.KEY_FAVORITE;
 import static com.example.prm391x_project_1_quangntnfx05544.Constant.KEY_ID;
 import static com.example.prm391x_project_1_quangntnfx05544.Constant.KEY_IS_FAVORITE;
 import static com.example.prm391x_project_1_quangntnfx05544.Constant.KEY_NAME;
+import static com.example.prm391x_project_1_quangntnfx05544.Constant.REQUEST_CODE_MAIN;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
@@ -26,11 +30,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         db = DatabaseHandler.getInstance(this);
 
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        if (bundle != null)
-            db.updateAnimalFavorite(bundle.getInt(KEY_ID), bundle.getBoolean(KEY_IS_FAVORITE));
-
         initData();
         initView();
     }
@@ -39,23 +38,25 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Animal> animals = db.getAllAnimals();
         for (Animal animal : animals) {
             int animalId = animal.getId();
+            ImageView favorite = findViewById(animal.getFavorite());
+
             findViewById(animalId).setOnClickListener(v -> {
                 v.startAnimation(AnimationUtils.loadAnimation(this, androidx.appcompat.R.anim.abc_fade_in));
                 Intent intent = new Intent(this, DetailActivity.class);
                 Bundle bundle = animalToBundle(db.getAnimal(animalId));
 
                 intent.putExtras(bundle);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE_MAIN);
             });
             if (animal.isFavorite()) {
-                ImageView favorite = findViewById(animal.getFavorite());
                 favorite.setVisibility(View.VISIBLE);
                 favorite.setOnClickListener(v -> {
                     v.startAnimation(AnimationUtils.loadAnimation(this, androidx.appcompat.R.anim.abc_fade_out));
                     favorite.setVisibility(View.GONE);
                     db.updateAnimalFavorite(animalId, false);
                 });
-
+            } else {
+                favorite.setVisibility(View.GONE);
             }
         }
     }
@@ -86,5 +87,19 @@ public class MainActivity extends AppCompatActivity {
         bundle.putBoolean(KEY_IS_FAVORITE, animal.isFavorite());
 
         return bundle;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if (requestCode == REQUEST_CODE_MAIN && resultCode == Activity.RESULT_OK) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                boolean isFavorite = bundle.getBoolean(KEY_IS_FAVORITE);
+                db.updateAnimalFavorite(bundle.getInt(KEY_ID), isFavorite);
+            }
+        }
+        initView();
     }
 }

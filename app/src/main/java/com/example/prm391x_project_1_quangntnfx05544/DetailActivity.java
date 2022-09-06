@@ -11,36 +11,26 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class DetailActivity extends AppCompatActivity {
-    private ImageView back, background, favorite, notFavorite;
-    private TextView animalName, animalDes;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-
-        initView(bundle);
+        initView();
     }
 
-    private void initView(Bundle bundle) {
-        back = findViewById(R.id.iv_back);
-        background = findViewById(R.id.iv_animal_background);
-        favorite = findViewById(R.id.iv_favorite);
-        notFavorite = findViewById(R.id.iv_not_favorite);
-        animalName = findViewById(R.id.tv_animal_name);
-        animalDes = findViewById(R.id.tv_animal_description);
+    private void initView() {
+        Bundle bundle = getIntent().getExtras();
 
-        back.setVisibility(View.VISIBLE);
-        background.setImageResource(bundle.getInt(KEY_BACKGROUND_IMAGE));
-        animalName.setText(bundle.getInt(KEY_NAME));
-        animalDes.setText(bundle.getInt(KEY_DESCRIPTION));
+        /* Set the UI resource depend on which animal user chose */
+        ((ImageView) findViewById(R.id.iv_animal_background)).setImageResource(bundle.getInt(KEY_BACKGROUND_IMAGE));
+        ((TextView) findViewById(R.id.tv_animal_name)).setText(bundle.getInt(KEY_NAME));
+        ((TextView) findViewById(R.id.tv_animal_description)).setText(bundle.getInt(KEY_DESCRIPTION));
 
+        ImageView favorite = findViewById(R.id.iv_favorite);
+        ImageView notFavorite = findViewById(R.id.iv_not_favorite);
+        /* For red heart appear when user liked animal */
         boolean isFavorite = bundle.getBoolean(KEY_IS_FAVORITE, false);
         if (isFavorite) favorite.setVisibility(View.VISIBLE);
-
         favorite.setOnClickListener(v -> {
             v.startAnimation(AnimationUtils.loadAnimation(this, androidx.appcompat.R.anim.abc_fade_out));
             favorite.setVisibility(View.GONE);
@@ -51,11 +41,14 @@ public class DetailActivity extends AppCompatActivity {
             v.startAnimation(AnimationUtils.loadAnimation(this, androidx.appcompat.R.anim.abc_fade_in));
             bundle.putBoolean(KEY_IS_FAVORITE, true);
         });
-        back.setOnClickListener(v -> {
-            v.startAnimation(AnimationUtils.loadAnimation(this, androidx.appcompat.R.anim.abc_fade_in));
+
+        /* Return to the main activity when user click on back icon */
+        findViewById(R.id.iv_back).setVisibility(View.VISIBLE);
+        findViewById(R.id.iv_back).setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtras(bundle);
-            startActivity(intent);
+            setResult(RESULT_OK, intent);
+            finish();
         });
     }
 }
